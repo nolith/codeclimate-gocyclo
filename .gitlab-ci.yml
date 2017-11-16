@@ -16,8 +16,7 @@ stages:
 
 .docker_build: &docker_build
   script:
-    - make image
-    - docker tag codeclimate/codeclimate-gocyclo "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
+    - docker build -t "$APPLICATION_REPOSITORY:$APPLICATION_TAG" .
     -  '[[ -n "$CI_REGISTRY_USER" ]] && docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"'
     - docker push "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
 
