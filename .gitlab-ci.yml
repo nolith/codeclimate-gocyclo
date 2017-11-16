@@ -1,0 +1,61 @@
+image: docker:git
+
+services:
+  - docker:dind
+
+variables:
+  REPO_NAME: gitlab.com/nolith/codeclimate-gocyclo
+  APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
+  APPLICATION_TAG: $CI_COMMIT_SHA
+  DOCKER_DRIVER: overlay2
+
+stages:
+  - build
+  - test
+  - release
+
+.docker_build: &docker_build
+  script:
+    - make image
+    - docker tag codeclimate/codeclimate-gocyclo "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
+    -  '[[ -n "$CI_REGISTRY_USER" ]] && docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"'
+    - docker push "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
+
+.docker_release: &docker_release
+  stage: release
+  variables:
+    RELEASE_REPOSITORY: $CI_REGISTRY_IMAGE
+    RELEASE_TAG: latest
+  script:
+    - docker pull "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
+    - docker tag "$APPLICATION_REPOSITORY:$APPLICATION_TAG" "$RELEASE_REPOSITORY:$RELEASE_TAG" 
+    - '[[ -n "$CI_REGISTRY_USER" ]] && docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"'
+    - docker push "$RELEASE_REPOSITORY:$RELEASE_TAG"
+
+docker_image:
+  <<: *docker_build
+  stage: build
+
+codequality:
+  stage: test
+  script:
+    - docker pull "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
+    - docker tag "$APPLICATION_REPOSITORY:$APPLICATION_TAG" codeclimate/codeclimante-gocyclo
+    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > codeclimate.json
+  artifacts:
+    paths: [codeclimate.json]
+    expire_in: 1 week
+
+docker tagged image:
+  <<: *docker_release
+  variables:
+    RELEASE_TAG: $CI_COMMIT_TAG 
+  only:
+    - tags
+  
+promote to latest:
+  <<: *docker_release
+  only:
+    - tags
+    - master
+  when: manual

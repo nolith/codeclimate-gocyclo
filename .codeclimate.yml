@@ -1,0 +1,16 @@
+engines:
+  gofmt:
+    enabled: true
+  golint:
+    enabled: true
+  govet:
+    enabled: true
+  gocyclo:
+    enabled: true
+    config:
+      over: 5
+ratings:
+  paths:
+  - "**.go"
+exclude_paths:
+- vendor/
