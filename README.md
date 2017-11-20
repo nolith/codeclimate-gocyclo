@@ -16,7 +16,8 @@ Like the `gocyclo` binary, you can configure the minimum allowed cyclomatic comp
 The default value is `9`: you can configure your own threshold in your `.codeclimate.yml`:
 
 ```yaml
-engines:
+version: "2"
+plugins:
   gocyclo:
     enabled: true
     config:
