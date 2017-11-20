@@ -1,4 +1,9 @@
-engines:
+version: "2"
+plugins:
+  structure:
+    enabled: false
+  duplication:
+    enabled: false
   gofmt:
     enabled: true
   golint:
@@ -9,8 +14,5 @@ engines:
     enabled: true
     config:
       over: 5
-ratings:
-  paths:
-  - "**.go"
-exclude_paths:
+exclude_patterns:
 - vendor/
