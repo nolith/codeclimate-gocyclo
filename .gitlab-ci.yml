@@ -40,7 +40,7 @@ codequality:
   script:
     - docker pull "$APPLICATION_REPOSITORY:$APPLICATION_TAG"
     - docker tag "$APPLICATION_REPOSITORY:$APPLICATION_TAG" codeclimate/codeclimante-gocyclo
-    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json > codeclimate.json
+    - docker run --env CODECLIMATE_CODE="$PWD" --volume "$PWD":/code --volume /var/run/docker.sock:/var/run/docker.sock --volume /tmp/cc:/tmp/cc codeclimate/codeclimate analyze -f json | tee codeclimate.json
   artifacts:
     paths: [codeclimate.json]
     expire_in: 1 week
