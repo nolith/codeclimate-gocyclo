@@ -1,0 +1,11 @@
+{
+  "name": "gocyclo",
+  "description": "gocyclo calculates cyclomatic complexities of functions in Go source code.",
+  "maintainer": {
+    "name": "Alessio Caiazza",
+    "email": "acaiazza@gitlab.com"
+  },
+  "languages" : ["Go"],
+  "version": "camputed at build time",
+  "spec_version": "0.3.1"
+}
